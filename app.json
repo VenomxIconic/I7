@@ -1,31 +1,58 @@
-{
-    "name": "GitGram",
-    "description": "GitHub and GitLab Integration for Telegram Bot API",
-    "logo": "",
-    "keywords": [
-        "telegram",
-        "github"
-    ],
-    "repository": "https://github.com/pokurt/GitGram",
-    "website": "https://github.com/pokurt/GitGram",
-    "success_url": "https://t.me/GitGramChat",
-    "stack": "container",
-    "env": {
-        "ENV": {
-            "description": "Fill this if you using environ variable as config.",
-            "value": "True"
-        },
-        "BOT_TOKEN": {
-            "description": "Get Bot API Token from @BotFather",
-            "value": ""
-        },
-        "PROJECT_NAME": {
-            "description": "Project of what you desire",
-            "value": ""
-        },
-        "APP_URL": {
-            "description": "Heroku app url, example: https://appname.herokuapp.com",
-            "value": ""
-        }
-    }
-  }
+from telegram import Update, ForceReply
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+
+# Start command
+def start(update: Update, context: CallbackContext) -> None:
+    user = update.message.from_user
+    update.message.reply_text(f"Hello {user.first_name}! How can I help you today?")
+
+# Info command
+def info(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text("This is a basic bot to answer your questions. You can type your question or use commands like /menu.")
+
+# Menu command
+def menu(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(
+        "Here is what you can do:\n"
+        "/start - Start the bot\n"
+        "/info - Get information about the bot\n"
+        "/menu - Show the available commands"
+    )
+
+# Echo user questions and respond as admin
+def handle_questions(update: Update, context: CallbackContext) -> None:
+    user_question = update.message.text
+    user = update.message.from_user
+    # Admin receives the question (you can store it in a database or log it)
+    print(f"Question from {user.first_name}: {user_question}")
+    
+    # Automatically reply with a confirmation message
+    update.message.reply_text("Your question has been received. Admin will reply shortly.")
+
+# Main function to start the bot
+def main() -> None:
+    # Your bot token (replace with your actual bot token)
+    TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
+    
+    # Create the Updater and pass it your bot's token.
+    updater = Updater(TOKEN)
+
+    # Get the dispatcher to register handlers
+    dispatcher = updater.dispatcher
+
+    # Register the command handlers
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("info", info))
+    dispatcher.add_handler(CommandHandler("menu", menu))
+
+    # Handle text messages (user questions)
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_questions))
+
+    # Start the Bot
+    updater.start_polling()
+
+    # Run the bot until you press Ctrl-C
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
