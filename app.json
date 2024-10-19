@@ -32,7 +32,7 @@ def handle_questions(update: Update, context: CallbackContext) -> None:
 # Main function to start the bot
 def main() -> None:
     # Your bot token (replace with your actual bot token)
-    TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
+    TOKEN = "7334142227:AAHGpsDcaeq12ss2th666ruYIMvLCflcCGw"
     
     # Create the Updater and pass it your bot's token.
     updater = Updater(TOKEN)
